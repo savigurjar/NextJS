@@ -1,0 +1,28 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())        // Primary key (auto-generated cuid)
+  clerkId    String   @unique                    // Unique Clerk (auth) ID
+  email      String   @unique                    // User email, must be unique
+  username   String?  @unique                    // Optional username (unique if provided)
+
+  firstName  String?                             // Optional first name
+  lastName   String?                             // Optional last name
+  imageUrl   String?                             // Optional profile picture URL
+
+  bio        String?  @db.VarChar(500)           // Optional short bio, max 500 chars
+
+  createdAt  DateTime @default(now())            // Timestamp for creation
+  updatedAt  DateTime @updatedAt                 // Auto-updates on modification
+}
+
