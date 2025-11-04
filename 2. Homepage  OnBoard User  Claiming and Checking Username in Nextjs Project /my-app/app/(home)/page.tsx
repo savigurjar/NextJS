@@ -1,11 +1,14 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import "dotenv/config"
+import { onboardUser } from "@/modules/auth/actions";
 
-export default function Home() {
+const HomePage = async()=> {
+  await onboardUser()
   return (
     <div >
-      
+      Homepage
     </div>
   );
 }
+export default HomePage
