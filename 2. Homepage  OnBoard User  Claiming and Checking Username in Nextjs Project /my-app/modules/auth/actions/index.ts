@@ -35,6 +35,7 @@ export const onboardUser = async () => {
       },
     });
 
+
     return {
       success: true,
       user: newUser,
