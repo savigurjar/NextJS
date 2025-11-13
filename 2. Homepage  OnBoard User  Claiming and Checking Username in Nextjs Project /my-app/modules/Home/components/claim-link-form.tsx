@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, Link, Loader2 } from "lucide-react";
-import { checkProfileUsernameAvailability, claimUsername } from "@/modules/profile/actions";
+import { Check, Loader2 } from "lucide-react";
+import { checkProfileUsernameAvailability, claimUsername } from "@/modules/Profile/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,7 @@ const ClaimLinkForm = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isClaming, setIsClaiming] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -30,6 +30,8 @@ const ClaimLinkForm = () => {
           const result = await checkProfileUsernameAvailability(linkValue);
           setIsAvailable(result.available);
           setSuggestions(result.suggestions || []);
+        } catch (error) {
+          console.error("Error checking username:", error);
         } finally {
           setIsChecking(false);
         }
@@ -41,28 +43,26 @@ const ClaimLinkForm = () => {
     }
   }, [linkValue]);
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      e.preventDefault();
-    if (linkValue.trim() && isAvailable) {
-      setIsClaiming(true);
-      const result = await claimUsername(linkValue);
-      if(result.success){
-        toast.success("Link claimed successfully!");
-        setLinkValue("");
-        router.push(/admin)
+      if (linkValue.trim() && isAvailable) {
+        setIsClaiming(true);
+        const result = await claimUsername(linkValue);
+        if (result.success) {
+          toast.success("Link claimed successfully!");
+          setLinkValue("");
+          router.push("/admin/myTree"); // ✅ fixed: added quotes
+        } else {
+          toast.error(result.error || "Failed to claim link.");
+        }
       }
-    }
     } catch (error) {
       console.error("Error claiming link:", error);
       toast.error("Failed to claim link. Please try again.");
-      
-    }
-    finally{
+    } finally {
       setIsClaiming(false);
     }
-    
-   
   };
 
   const displayOrigin = origin
@@ -109,6 +109,7 @@ const ClaimLinkForm = () => {
               )}
             </div>
           </div>
+
           {/* Availability Message */}
           {linkValue && !isChecking && (
             <div className="mt-2 text-sm">
@@ -124,7 +125,8 @@ const ClaimLinkForm = () => {
                   </span>
                   {suggestions.length > 0 && (
                     <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-                      Suggestions: {suggestions.map(s => (
+                      Suggestions:{" "}
+                      {suggestions.map((s) => (
                         <button
                           key={s}
                           type="button"
@@ -141,21 +143,26 @@ const ClaimLinkForm = () => {
             </div>
           )}
         </div>
+
         <Button
           type="submit"
-          disabled={!linkValue.trim() || !isAvailable || isChecking }
+          disabled={!linkValue.trim() || !isAvailable || isChecking}
           className="w-full h-12 text-base font-medium"
           size="lg"
         >
-          {
-            isClaming ? (<Loader2 className="w-4 h-4 animate-spin" />) : "Claim Your TreeBio Link"
-          }
+          {isClaiming ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            "Claim Your TreeBio Link"
+          )}
         </Button>
+
         <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center w-full">
           By continuing, you agree to TreeBio's Terms of Service and Privacy
           Policy.
         </p>
       </form>
+
       {/* Preview */}
       {linkValue && isAvailable && (
         <div className="mt-6 p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700">
