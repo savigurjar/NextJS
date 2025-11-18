@@ -18,7 +18,7 @@ const HomePage = async () => {
         <div className="space-y-6">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-zinc-50">
             Your digital presence.<br />
-            <span className="text-[#418313]">Unified in one smart link.</span>
+            <span class="text-[#418313]">Unified in one smart link.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
